@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Labu Karya Publisher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <img src="Labu_Karya_Pub.jpeg" alt="Logo" class="nav-logo-img" onerror="this.style.display='none'"/>
+      <span class="logo-text">Labu<span class="accent">Karya</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#home" class="nav-link active" data-page="home">Beranda</a></li>
+      <li><a href="#katalog" class="nav-link" data-page="katalog">Katalog</a></li>
+      <li><a href="#toko" class="nav-link" data-page="toko">Toko Kami</a></li>
+      <li><a href="#tentang" class="nav-link" data-page="tentang">Tentang</a></li>
+    </ul>
+    <button class="btn-upload-nav" id="btnUploadNav">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Karya
+    </button>
+    <button class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="#home" class="mob-link">Beranda</a></li>
+    <li><a href="#katalog" class="mob-link">Katalog</a></li>
+    <li><a href="#toko" class="mob-link">Toko Kami</a></li>
+    <li><a href="#tentang" class="mob-link">Tentang</a></li>
+    <li><a href="#" class="mob-link upload-trigger" id="btnUploadMob">Upload Karya</a></li>
+  </ul>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose">&#x2715;</button>
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div>
+        <h2 class="modal-title">Upload Karya</h2>
+        <p class="modal-sub">Isi detail karya Anda untuk ditampilkan di katalog</p>
+      </div>
+    </div>
+    <form class="upload-form" id="uploadForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nama Penulis <span class="req">*</span></label>
+          <input type="text" name="penulis" placeholder="Nama lengkap penulis" required/>
+        </div>
+        <div class="form-group">
+          <label>Email / Kontak</label>
+          <input type="text" name="kontak" placeholder="email@example.com"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Judul Buku <span class="req">*</span></label>
+        <input type="text" name="judul" placeholder="Judul buku Anda" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Genre <span class="req">*</span></label>
+          <select name="genre" required>
+            <option value="">-- Pilih Genre --</option>
+            <option>Cerpen Inspiratif</option>
+            <option>Romance</option>
+            <option>Fiksi Ilmiah</option>
+            <option>Fantasi</option>
+            <option>Thriller & Misteri</option>
+            <option>Pendidikan</option>
+            <option>Biografi</option>
+            <option>Self-Help</option>
+            <option>Puisi & Sastra</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Harga Buku <span class="req">*</span></label>
+          <input type="text" name="harga" placeholder="Rp 0.000" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sinopsis / Ringkasan <span class="req">*</span></label>
+        <textarea name="sinopsis" rows="4" placeholder="Tuliskan sinopsis atau ringkasan materi buku..." required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Link Pembelian Shopee</label>
+          <input type="url" name="linkShopee" placeholder="https://shopee.co.id/..."/>
+        </div>
+        <div class="form-group">
+          <label>Link Pembelian Tokopedia</label>
+          <input type="url" name="linkTokopedia" placeholder="https://tokopedia.com/..."/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Upload Cover Buku</label>
+        <div class="file-drop" id="fileDrop">
+          <svg width="36" height="36" fill="none" stroke="var(--blue-mid)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Drag & drop atau <span class="file-browse" id="fileBrowse">pilih file</span></p>
+          <small>PNG, JPG, WEBP (maks. 5MB)</small>
+          <input type="file" name="cover" id="coverInput" accept="image/*" hidden/>
+        </div>
+        <div class="preview-wrap" id="previewWrap" style="display:none">
+          <img id="previewImg" src="" alt="preview"/>
+          <button type="button" class="remove-img" id="removeImg">&#x2715; Hapus</button>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" id="btnCancel">Batal</button>
+        <button type="submit" class="btn-submit">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Tambahkan ke Katalog
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast">
+  <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg">Karya berhasil ditambahkan!</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<main>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="bubble b1"></div>
+      <div class="bubble b2"></div>
+      <div class="bubble b3"></div>
+      <div class="bubble b4"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">✦ Platform Penerbitan Karya Lokal ✦</div>
+      <h1 class="hero-title">
+        Temukan <em>Buku Luar Biasa</em><br/>dari Penulis Berbakat
+      </h1>
+      <p class="hero-desc">
+        Labu Karya Publisher adalah rumah bagi para penulis kreatif Indonesia. Kami menerbitkan, menampilkan, dan menghubungkan karya Anda langsung ke tangan pembaca.
+      </p>
+      <div class="hero-btns">
+        <a href="#katalog" class="btn-primary">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Jelajahi Katalog
+        </a>
+        <button class="btn-secondary upload-trigger">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Karya Saya
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span id="statBuku">0</span><small>Buku Tersedia</small></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span>2</span><small>Platform Toko</small></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span>5</span><small>Pengembang</small></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="flask-glow"></div>
+      <img src="Labu_Karya_Pub.jpeg" alt="Labu Karya Publisher" class="hero-logo" onerror="this.src=''; this.className='hero-logo fallback'"/>
+    </div>
+  </section>
+
+  <!-- IDENTITY STRIP -->
+  <section class="identity-strip">
+    <div class="strip-inner">
+      <div class="strip-item">
+        <svg width="28" height="28" fill="none" stroke="var(--blue-bright)" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <div><strong>Penerbitan Mandiri</strong><span>Bantu penulis wujudkan impian</span></div>
+      </div>
+      <div class="strip-item">
+        <svg width="28" height="28" fill="none" stroke="var(--blue-bright)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <div><strong>Jangkauan Luas</strong><span>Tersedia di Shopee & Tokopedia</span></div>
+      </div>
+      <div class="strip-item">
+        <svg width="28" height="28" fill="none" stroke="var(--blue-bright)" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div><strong>Komunitas Penulis</strong><span>Bergabung & berkembang bersama</span></div>
+      </div>
+      <div class="strip-item">
+        <svg width="28" height="28" fill="none" stroke="var(--blue-bright)" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <div><strong>Kualitas Terjamin</strong><span>Kurasi & seleksi terbaik</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KATALOG SECTION -->
+  <section class="section-katalog" id="katalog">
+    <div class="section-inner">
+      <div class="section-head">
+        <span class="section-label">📚 Koleksi Kami</span>
+        <h2 class="section-title">Katalog <span class="text-blue">Produk</span></h2>
+        <p class="section-desc">Temukan berbagai buku pilihan dari penulis berbakat Indonesia</p>
+      </div>
+      <div class="filter-bar">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari judul atau penulis..."/>
+        <div class="genre-filters" id="genreFilters">
+          <button class="genre-btn active" data-genre="all">Semua</button>
+          <button class="genre-btn" data-genre="Cerpen Inspiratif">Inspiratif</button>
+          <button class="genre-btn" data-genre="Romance">Romance</button>
+          <button class="genre-btn" data-genre="Pendidikan">Pendidikan</button>
+          <button class="genre-btn" data-genre="Self-Help">Self-Help</button>
+        </div>
+      </div>
+      <div class="catalog-grid" id="catalogGrid">
+        <!-- Cards populated by JS -->
+      </div>
+      <div class="catalog-empty" id="catalogEmpty" style="display:none">
+        <div class="empty-icon">📭</div>
+        <h3>Katalog Masih Kosong</h3>
+        <p>Jadilah yang pertama menambahkan karya ke katalog kami!</p>
+        <button class="btn-primary upload-trigger" style="margin-top:1rem">Upload Karya Pertama</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKO SECTION -->
+  <section class="section-toko" id="toko">
+    <div class="section-inner">
+      <div class="section-head">
+        <span class="section-label">🛒 Beli Sekarang</span>
+        <h2 class="section-title">Temukan di <span class="text-blue">Toko Kami</span></h2>
+        <p class="section-desc">Buku-buku Labu Karya Publisher tersedia di marketplace favorit Anda</p>
+      </div>
+      <div class="store-cards">
+        <a class="store-card shopee-card" href="https://shopee.co.id" target="_blank" rel="noopener">
+          <div class="store-icon">🛍️</div>
+          <div class="store-name">Shopee</div>
+          <div class="store-desc">Belanja mudah, aman & cepat di Shopee. Dapatkan promo dan gratis ongkir!</div>
+          <div class="store-btn shopee-btn">
+            Kunjungi Toko Shopee
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </a>
+        <a class="store-card tokped-card" href="https://tokopedia.com" target="_blank" rel="noopener">
+          <div class="store-icon">🏪</div>
+          <div class="store-name">Tokopedia</div>
+          <div class="store-desc">Temukan buku Labu Karya di Tokopedia dengan berbagai metode pembayaran!</div>
+          <div class="store-btn tokped-btn">
+            Kunjungi Toko Tokopedia
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TENTANG SECTION -->
+  <section class="section-tentang" id="tentang">
+    <div class="section-inner tentang-inner">
+      <div class="tentang-left">
+        <span class="section-label">✨ Siapa Kami</span>
+        <h2 class="section-title">Tentang <span class="text-blue">Labu Karya</span></h2>
+        <p>Labu Karya Publisher adalah platform penerbitan mandiri yang didirikan untuk membantu para penulis Indonesia mewujudkan impian mereka. Kami percaya setiap karya berhak untuk dibaca dan diapresiasi.</p>
+        <p>Nama <em>"Labu"</em> terinspirasi dari labu Erlenmeyer — simbol eksperimen, penemuan, dan inovasi. Karena bagi kami, setiap buku adalah sebuah eksperimen ide yang menunggu untuk meledak di benak pembaca.</p>
+        <div class="values-list">
+          <div class="value-item">
+            <span class="value-dot"></span>
+            <span>Mendukung penulis lokal dengan sepenuh hati</span>
+          </div>
+          <div class="value-item">
+            <span class="value-dot"></span>
+            <span>Kualitas konten adalah prioritas utama kami</span>
+          </div>
+          <div class="value-item">
+            <span class="value-dot"></span>
+            <span>Menjangkau pembaca di seluruh Indonesia</span>
+          </div>
+        </div>
+      </div>
+      <div class="tentang-right">
+        <div class="dev-card">
+          <div class="dev-header">
+            <svg width="22" height="22" fill="none" stroke="var(--blue-bright)" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Tim Pengembang
+          </div>
+          <ul class="dev-list">
+            <li>
+              <span class="dev-avatar">SA</span>
+              <div><strong>Satriya Agung Abadi</strong><small>Developer</small></div>
+            </li>
+            <li>
+              <span class="dev-avatar">AL</span>
+              <div><strong>Alfito Langgam Priambodo</strong><small>Developer</small></div>
+            </li>
+            <li>
+              <span class="dev-avatar">EE</span>
+              <div><strong>Elis Emandasari</strong><small>Developer</small></div>
+            </li>
+            <li>
+              <span class="dev-avatar">DI</span>
+              <div><strong>Dhia Istiqoma Pito Making</strong><small>Developer</small></div>
+            </li>
+            <li>
+              <span class="dev-avatar">NC</span>
+              <div><strong>Nadiyah Cahya Putrika</strong><small>Developer</small></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="logo-text">Labu<span class="accent">Karya</span></span>
+      <span class="footer-tagline">Publisher</span>
+      <p>Platform penerbitan karya lokal Indonesia.<br/>Setiap kata adalah sebuah eksperimen.</p>
+    </div>
+    <div class="footer-links">
+      <strong>Navigasi</strong>
+      <a href="#home">Beranda</a>
+      <a href="#katalog">Katalog</a>
+      <a href="#toko">Toko Kami</a>
+      <a href="#tentang">Tentang</a>
+    </div>
+    <div class="footer-links">
+      <strong>Marketplace</strong>
+      <a href="https://shopee.co.id" target="_blank">Shopee</a>
+      <a href="https://tokopedia.com" target="_blank">Tokopedia</a>
+    </div>
+    <div class="footer-links">
+      <strong>Pengembang</strong>
+      <span>Satriya Agung Abadi</span>
+      <span>Alfito Langgam Priambodo</span>
+      <span>Elis Emandasari</span>
+      <span>Dhia Istiqoma Pito Making</span>
+      <span>Nadiyah Cahya Putrika</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Labu Karya Publisher. All rights reserved.</span>
+    <span>Made with ❤️ in Indonesia</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

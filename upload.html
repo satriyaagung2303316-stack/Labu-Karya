@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Karya — Labu Karya Publisher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── CSS VARIABLES (match style.css) ── */
+    :root {
+      --blue-navy:   #0a1628;
+      --blue-dark:   #0d2147;
+      --blue-mid:    #1a4fa0;
+      --blue-bright: #2d7cf5;
+      --blue-light:  #5ba3ff;
+      --blue-glow:   #a8c8ff;
+      --blue-pale:   #ddeeff;
+      --white:       #ffffff;
+      --grey-light:  #f4f6fb;
+      --grey-mid:    #c5cdd8;
+      --grey-dark:   #6b7a8d;
+      --text-dark:   #0d1b2e;
+      --text-body:   #334155;
+      --shadow-sm:   0 2px 12px rgba(13,33,71,0.10);
+      --shadow-md:   0 8px 32px rgba(13,33,71,0.18);
+      --shadow-lg:   0 20px 60px rgba(13,33,71,0.24);
+      --radius-sm:   8px;
+      --radius-md:   16px;
+      --radius-lg:   24px;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Nunito', sans-serif;
+      --font-accent:  'Bebas Neue', sans-serif;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--text-body);
+      background: var(--grey-light);
+      overflow-x: hidden;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    button { cursor: pointer; border: none; font-family: var(--font-body); }
+    input, select, textarea { font-family: var(--font-body); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: var(--blue-navy); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-mid); border-radius: 4px; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(10, 22, 40, 0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(45,124,245,0.15);
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; gap: 2rem;
+      padding: 0.9rem 2rem;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
+    .nav-logo-img { width: 38px; height: 38px; object-fit: contain; border-radius: 50%; }
+    .logo-text {
+      font-family: var(--font-accent);
+      font-size: 1.6rem;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+    .logo-text .accent { color: var(--blue-bright); }
+    .nav-links {
+      display: flex; gap: 0.2rem;
+      margin-left: auto;
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.75);
+      font-weight: 600; font-size: 0.9rem;
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .nav-link:hover { color: var(--white); }
+    .nav-back {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: var(--white); font-weight: 700; font-size: 0.88rem;
+      padding: 0.5rem 1.1rem; border-radius: 50px;
+      transition: all 0.25s;
+    }
+    .nav-back:hover {
+      background: rgba(255,255,255,0.18);
+      transform: translateX(-2px);
+    }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--white); border-radius: 2px;
+    }
+
+    /* ── HERO BANNER ── */
+    .upload-hero {
+      background: linear-gradient(160deg, var(--blue-navy) 0%, var(--blue-dark) 60%, #0e2a52 100%);
+      padding: 7rem 2rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .upload-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(45,124,245,0.18), transparent);
+    }
+    .hero-bubble {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle, rgba(45,124,245,0.12), transparent);
+      pointer-events: none;
+    }
+    .hb1 { width: 380px; height: 380px; top: -100px; right: -80px; animation: float 9s ease-in-out infinite; }
+    .hb2 { width: 200px; height: 200px; bottom: -50px; left: 5%; animation: float 7s ease-in-out infinite 2s; }
+    .hb3 { width: 120px; height: 120px; top: 30%; left: 15%; animation: float 11s ease-in-out infinite 4s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-24px) scale(1.04); }
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(45,124,245,0.15);
+      border: 1px solid rgba(45,124,245,0.35);
+      color: var(--blue-light);
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 0.4rem 1.1rem; border-radius: 50px;
+      margin-bottom: 1.4rem;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-title-wrap {
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900; line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 0.9rem;
+    }
+    .hero-title em {
+      font-style: italic;
+      background: linear-gradient(90deg, var(--blue-bright), var(--blue-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      color: rgba(255,255,255,0.65);
+      font-size: 1rem; max-width: 520px; margin: 0 auto;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    /* ── PROGRESS STEPS ── */
+    .steps-bar {
+      background: var(--white);
+      border-bottom: 1px solid rgba(13,33,71,0.08);
+      position: sticky; top: 62px; z-index: 100;
+      box-shadow: 0 2px 16px rgba(13,33,71,0.08);
+    }
+    .steps-inner {
+      max-width: 860px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.1rem 2rem; gap: 0;
+    }
+    .step {
+      display: flex; align-items: center; gap: 0.7rem;
+      flex: 1; position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%);
+      width: calc(50% - 22px); height: 2px;
+      background: var(--grey-mid);
+      transition: background 0.4s;
+    }
+    .step.done:not(:last-child)::after,
+    .step.active:not(:last-child)::after { background: var(--blue-bright); }
+    .step-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem;
+      background: var(--grey-mid); color: var(--grey-dark);
+      flex-shrink: 0; transition: all 0.3s;
+      position: relative; z-index: 1;
+    }
+    .step.active .step-num {
+      background: var(--blue-bright); color: var(--white);
+      box-shadow: 0 0 0 4px rgba(45,124,245,0.2);
+    }
+    .step.done .step-num {
+      background: #1a8a4a; color: var(--white);
+    }
+    .step-label { font-size: 0.8rem; font-weight: 700; color: var(--grey-dark); white-space: nowrap; }
+    .step.active .step-label { color: var(--blue-bright); }
+    .step.done .step-label { color: #1a8a4a; }
+
+    /* ── MAIN LAYOUT ── */
+    .page-wrap {
+      max-width: 1100px; margin: 0 auto;
+      padding: 2.5rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .form-section {
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+    .form-section.active { display: block; }
+
+    .section-header {
+      padding: 1.6rem 2rem 0;
+      margin-bottom: 1.5rem;
+    }
+    .section-num {
+      font-family: var(--font-accent);
+      font-size: 0.85rem; letter-spacing: 3px;
+      color: var(--blue-bright); margin-bottom: 0.3rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text-dark);
+    }
+    .section-body { padding: 0 2rem 2rem; display: flex; flex-direction: column; gap: 1.1rem; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-weight: 700; font-size: 0.86rem; color: var(--text-dark); }
+    .req { color: #e55; }
+    .field-hint { font-size: 0.76rem; color: var(--grey-dark); margin-top: 0.2rem; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--grey-light);
+      border: 1.5px solid var(--grey-mid);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 1rem;
+      font-size: 0.92rem; color: var(--text-dark);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      outline: none; width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--blue-bright);
+      box-shadow: 0 0 0 3px rgba(45,124,245,0.12);
+      background: var(--white);
+    }
+    .form-group input.error,
+    .form-group select.error,
+    .form-group textarea.error {
+      border-color: #e55;
+      box-shadow: 0 0 0 3px rgba(221,85,85,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .error-msg { font-size: 0.76rem; color: #c00; display: none; }
+    .error-msg.visible { display: block; }
+
+    /* ── GENRE PICKER ── */
+    .genre-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+    }
+    .genre-chip {
+      border: 1.5px solid var(--grey-mid);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.7rem;
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--grey-dark);
+      background: var(--grey-light);
+      text-align: center; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .genre-chip:hover { border-color: var(--blue-light); color: var(--blue-mid); background: var(--blue-pale); }
+    .genre-chip.selected {
+      border-color: var(--blue-bright); color: var(--blue-mid);
+      background: rgba(45,124,245,0.08);
+      box-shadow: 0 0 0 3px rgba(45,124,245,0.1);
+    }
+
+    /* ── FILE DROP ── */
+    .file-drop {
+      border: 2px dashed var(--grey-mid);
+      border-radius: var(--radius-md);
+      padding: 2.2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+      position: relative;
+    }
+    .file-drop:hover, .file-drop.dragover {
+      border-color: var(--blue-bright);
+      background: var(--blue-pale);
+    }
+    .file-drop-icon {
+      width: 54px; height: 54px; border-radius: var(--radius-md);
+      background: rgba(45,124,245,0.1);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.3rem;
+    }
+    .file-drop p { color: var(--grey-dark); font-size: 0.9rem; }
+    .file-browse { color: var(--blue-bright); font-weight: 700; cursor: pointer; }
+    .file-drop small { color: var(--grey-mid); font-size: 0.78rem; }
+    .file-drop input[type="file"] { display: none; }
+    .preview-wrap {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.2rem;
+      background: var(--grey-light);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--grey-mid);
+    }
+    .preview-wrap img { width: 72px; height: 96px; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+    .preview-info { flex: 1; }
+    .preview-name { font-weight: 700; font-size: 0.88rem; color: var(--text-dark); }
+    .preview-size { font-size: 0.78rem; color: var(--grey-dark); }
+    .remove-img {
+      background: #fee; color: #c00; border: 1px solid #fcc;
+      font-size: 0.8rem; font-weight: 700;
+      padding: 0.35rem 0.8rem; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    }
+    .remove-img:hover { background: #fcc; }
+
+    /* ── LINK PAIR ── */
+    .link-pair {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .link-field {
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .link-field label {
+      font-weight: 700; font-size: 0.86rem; color: var(--text-dark);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .link-badge {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px;
+      padding: 0.1rem 0.5rem; border-radius: 50px;
+    }
+    .shopee-badge { background: #fff0e6; color: #ee5c00; }
+    .tokped-badge { background: #e8f5e8; color: #00880a; }
+
+    /* ── NAVIGATION BUTTONS ── */
+    .form-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.3rem 2rem;
+      border-top: 1px solid var(--grey-light);
+      background: var(--grey-light);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+    .btn-prev {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: transparent;
+      border: 1.5px solid var(--grey-mid);
+      color: var(--grey-dark); font-weight: 700; font-size: 0.9rem;
+      padding: 0.65rem 1.3rem; border-radius: 50px;
+      transition: all 0.2s;
+    }
+    .btn-prev:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
+    .btn-prev:disabled { opacity: 0.3; pointer-events: none; }
+    .btn-next {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--blue-bright), var(--blue-mid));
+      color: var(--white); font-weight: 700; font-size: 0.9rem;
+      padding: 0.65rem 1.6rem; border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(45,124,245,0.4);
+      transition: all 0.25s;
+    }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(45,124,245,0.5); }
+    .btn-submit-final {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #1a8a4a, #0f6b38);
+      color: var(--white); font-weight: 800; font-size: 0.95rem;
+      padding: 0.75rem 2rem; border-radius: 50px;
+      box-shadow: 0 6px 20px rgba(26,138,74,0.4);
+      transition: all 0.25s;
+    }
+    .btn-submit-final:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,138,74,0.5); }
+
+    /* ── PREVIEW SIDEBAR ── */
+    .preview-sidebar { position: sticky; top: 130px; }
+    .sidebar-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .sidebar-header {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+    .sidebar-header-icon {
+      width: 34px; height: 34px; background: rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-header h3 { font-family: var(--font-display); font-size: 1rem; color: var(--white); font-weight: 700; }
+    .sidebar-header small { color: rgba(255,255,255,0.65); font-size: 0.76rem; display: block; }
+    .sidebar-body { padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .preview-book-cover {
+      width: 100%; aspect-ratio: 2/3;
+      background: linear-gradient(145deg, var(--blue-pale), var(--grey-light));
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px dashed var(--grey-mid);
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-book-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .cover-placeholder {
+      text-align: center; color: var(--grey-dark);
+      font-size: 0.82rem; padding: 1rem;
+    }
+    .cover-placeholder svg { margin: 0 auto 0.5rem; opacity: 0.4; }
+    .preview-meta { display: flex; flex-direction: column; gap: 0.6rem; }
+    .meta-row { display: flex; flex-direction: column; gap: 0.1rem; }
+    .meta-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-dark); }
+    .meta-value { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+    .meta-value.empty { color: var(--grey-mid); font-style: italic; font-weight: 400; font-size: 0.84rem; }
+    .meta-genre-chip {
+      display: inline-block;
+      background: rgba(45,124,245,0.1); color: var(--blue-mid);
+      border: 1px solid rgba(45,124,245,0.2);
+      padding: 0.2rem 0.7rem; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .meta-price {
+      font-family: var(--font-accent);
+      font-size: 1.3rem; color: var(--blue-bright); letter-spacing: 1px;
+    }
+    .sidebar-tip {
+      background: rgba(45,124,245,0.06);
+      border: 1px solid rgba(45,124,245,0.15);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.2rem;
+      font-size: 0.8rem; color: var(--blue-mid); line-height: 1.5;
+    }
+    .sidebar-tip strong { display: block; margin-bottom: 0.2rem; color: var(--blue-dark); }
+
+    /* ── SUCCESS SCREEN ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #1a8a4a, #0f6b38);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 10px 30px rgba(26,138,74,0.35);
+      animation: popIn 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem; font-weight: 900;
+      color: var(--text-dark); margin-bottom: 0.7rem;
+    }
+    .success-desc { color: var(--grey-dark); font-size: 0.95rem; max-width: 400px; margin: 0 auto 2rem; line-height: 1.7; }
+    .success-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-home {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--blue-bright), var(--blue-mid));
+      color: var(--white); font-weight: 700; font-size: 0.92rem;
+      padding: 0.75rem 1.8rem; border-radius: 50px;
+      box-shadow: 0 6px 20px rgba(45,124,245,0.4);
+      transition: all 0.25s;
+    }
+    .btn-home:hover { transform: translateY(-2px); }
+    .btn-upload-again {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border: 1.5px solid var(--grey-mid); color: var(--grey-dark);
+      font-weight: 700; font-size: 0.92rem;
+      padding: 0.75rem 1.8rem; border-radius: 50px;
+      background: transparent; transition: all 0.25s;
+    }
+    .btn-upload-again:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 3000;
+      background: #c00;
+      color: var(--white); font-weight: 700; font-size: 0.88rem;
+      padding: 0.8rem 1.4rem; border-radius: 50px;
+      display: flex; align-items: center; gap: 0.6rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none; max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: #1a8a4a; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .preview-sidebar { position: static; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .steps-inner { gap: 0; padding: 0.9rem 1rem; }
+      .step-label { display: none; }
+      .form-row, .link-pair { grid-template-columns: 1fr; }
+      .genre-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-wrap { padding: 1.5rem 1rem 4rem; }
+    }
+    @media (max-width: 480px) {
+      .upload-hero { padding: 6rem 1.2rem 2.5rem; }
+      .genre-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-body { padding: 0 1.2rem 1.5rem; }
+      .form-nav { padding: 1rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <img src="Labu_Karya_Pub.jpeg" alt="Logo" class="nav-logo-img" onerror="this.style.display='none'"/>
+      <span class="logo-text">Labu<span class="accent">Karya</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#home" class="nav-link">Beranda</a></li>
+      <li><a href="index.html#katalog" class="nav-link">Katalog</a></li>
+      <li><a href="index.html#toko" class="nav-link">Toko Kami</a></li>
+      <li><a href="index.html#tentang" class="nav-link">Tentang</a></li>
+    </ul>
+    <a href="index.html" class="nav-back">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Kembali
+    </a>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- HERO BANNER -->
+<div class="upload-hero">
+  <div class="hero-bubble hb1"></div>
+  <div class="hero-bubble hb2"></div>
+  <div class="hero-bubble hb3"></div>
+  <div class="hero-badge">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Form Upload Karya
+  </div>
+  <div class="hero-title-wrap">
+    <h1 class="hero-title">Bagikan <em>Karya Terbaik</em> Anda</h1>
+    <p class="hero-desc">Isi formulir di bawah ini untuk mendaftarkan buku Anda ke katalog Labu Karya Publisher.</p>
+  </div>
+</div>
+
+<!-- PROGRESS STEPS -->
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step active" id="step-ind-1">
+      <div class="step-num" id="step-num-1">1</div>
+      <span class="step-label">Identitas Penulis</span>
+    </div>
+    <div class="step" id="step-ind-2">
+      <div class="step-num" id="step-num-2">2</div>
+      <span class="step-label">Detail Buku</span>
+    </div>
+    <div class="step" id="step-ind-3">
+      <div class="step-num" id="step-num-3">3</div>
+      <span class="step-label">Cover & Tautan</span>
+    </div>
+    <div class="step" id="step-ind-4">
+      <div class="step-num" id="step-num-4">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span class="step-label">Selesai</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN PAGE WRAP -->
+<div class="page-wrap">
+
+  <!-- LEFT: FORM CARD -->
+  <div class="form-card" id="formCard">
+
+    <!-- STEP 1: Identitas Penulis -->
+    <div class="form-section active" id="section-1">
+      <div class="section-header">
+        <div class="section-num">LANGKAH 01</div>
+        <h2 class="section-title">Identitas Penulis</h2>
+      </div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nama Lengkap Penulis <span class="req">*</span></label>
+            <input type="text" id="f-penulis" placeholder="cth. Budi Santoso" autocomplete="name"/>
+            <span class="error-msg" id="err-penulis">Nama penulis wajib diisi.</span>
+          </div>
+          <div class="form-group">
+            <label>Nama Pena / Pseudonim</label>
+            <input type="text" id="f-pena" placeholder="Jika berbeda dari nama asli"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" id="f-email" placeholder="email@example.com" autocomplete="email"/>
+            <span class="error-msg" id="err-email">Email yang valid wajib diisi.</span>
+          </div>
+          <div class="form-group">
+            <label>No. WhatsApp / Telepon</label>
+            <input type="tel" id="f-telp" placeholder="08xx-xxxx-xxxx"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bio Singkat Penulis</label>
+          <textarea id="f-bio" rows="3" placeholder="Ceritakan sedikit tentang diri Anda, pengalaman menulis, atau inspirasi Anda..."></textarea>
+          <span class="field-hint">Maks. 300 karakter. Akan ditampilkan di halaman profil penulis.</span>
+        </div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-prev" disabled>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Sebelumnya
+        </button>
+        <button class="btn-next" onclick="nextStep(1)">
+          Selanjutnya
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Detail Buku -->
+    <div class="form-section" id="section-2">
+      <div class="section-header">
+        <div class="section-num">LANGKAH 02</div>
+        <h2 class="section-title">Detail Buku</h2>
+      </div>
+      <div class="section-body">
+        <div class="form-group">
+          <label>Judul Buku <span class="req">*</span></label>
+          <input type="text" id="f-judul" placeholder="Judul lengkap buku Anda"/>
+          <span class="error-msg" id="err-judul">Judul buku wajib diisi.</span>
+        </div>
+        <div class="form-group">
+          <label>Genre <span class="req">*</span></label>
+          <span class="error-msg" id="err-genre">Pilih minimal satu genre.</span>
+          <div class="genre-grid">
+            <button type="button" class="genre-chip" data-genre="Cerpen Inspiratif">📖 Cerpen Inspiratif</button>
+            <button type="button" class="genre-chip" data-genre="Romance">💕 Romance</button>
+            <button type="button" class="genre-chip" data-genre="Fiksi Ilmiah">🚀 Fiksi Ilmiah</button>
+            <button type="button" class="genre-chip" data-genre="Fantasi">🧙 Fantasi</button>
+            <button type="button" class="genre-chip" data-genre="Thriller & Misteri">🔍 Thriller & Misteri</button>
+            <button type="button" class="genre-chip" data-genre="Pendidikan">🎓 Pendidikan</button>
+            <button type="button" class="genre-chip" data-genre="Biografi">👤 Biografi</button>
+            <button type="button" class="genre-chip" data-genre="Self-Help">💪 Self-Help</button>
+            <button type="button" class="genre-chip" data-genre="Puisi & Sastra">🌸 Puisi & Sastra</button>
+            <button type="button" class="genre-chip" data-genre="Agama & Spiritual">🕌 Agama & Spiritual</button>
+            <button type="button" class="genre-chip" data-genre="Komedi">😄 Komedi</button>
+            <button type="button" class="genre-chip" data-genre="Lainnya">📦 Lainnya</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Harga Jual <span class="req">*</span></label>
+            <input type="text" id="f-harga" placeholder="cth. 85000"/>
+            <span class="field-hint">Masukkan angka saja, tanpa Rp atau titik.</span>
+            <span class="error-msg" id="err-harga">Harga wajib diisi.</span>
+          </div>
+          <div class="form-group">
+            <label>Jumlah Halaman</label>
+            <input type="number" id="f-halaman" placeholder="cth. 180" min="1"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sinopsis / Ringkasan <span class="req">*</span></label>
+          <textarea id="f-sinopsis" rows="5" placeholder="Tuliskan sinopsis menarik yang membuat pembaca penasaran..."></textarea>
+          <span class="error-msg" id="err-sinopsis">Sinopsis wajib diisi.</span>
+        </div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-prev" onclick="prevStep(2)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Sebelumnya
+        </button>
+        <button class="btn-next" onclick="nextStep(2)">
+          Selanjutnya
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Cover & Tautan -->
+    <div class="form-section" id="section-3">
+      <div class="section-header">
+        <div class="section-num">LANGKAH 03</div>
+        <h2 class="section-title">Cover Buku & Tautan Pembelian</h2>
+      </div>
+      <div class="section-body">
+        <div class="form-group">
+          <label>Upload Cover Buku</label>
+          <div class="file-drop" id="fileDrop">
+            <div class="file-drop-icon">
+              <svg width="26" height="26" fill="none" stroke="var(--blue-mid)" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9l4-4 4 4 4-4 4 4"/><line x1="12" y1="14" x2="12" y2="19"/></svg>
+            </div>
+            <p>Drag & drop atau <span class="file-browse" id="fileBrowse">pilih file gambar</span></p>
+            <small>PNG, JPG, WEBP — Maks. 5MB — Disarankan rasio 2:3 (portrait)</small>
+            <input type="file" id="coverInput" accept="image/png,image/jpeg,image/webp"/>
+          </div>
+          <div class="preview-wrap" id="previewWrap" style="display:none">
+            <img id="previewImg" src="" alt="Cover preview"/>
+            <div class="preview-info">
+              <div class="preview-name" id="previewName">—</div>
+              <div class="preview-size" id="previewSize">—</div>
+            </div>
+            <button type="button" class="remove-img" id="removeImg">✕ Hapus</button>
+          </div>
+        </div>
+        <div class="link-pair">
+          <div class="link-field">
+            <label>
+              Link Shopee
+              <span class="link-badge shopee-badge">Shopee</span>
+            </label>
+            <input type="url" id="f-shopee" placeholder="https://shopee.co.id/..."/>
+          </div>
+          <div class="link-field">
+            <label>
+              Link Tokopedia
+              <span class="link-badge tokped-badge">Tokopedia</span>
+            </label>
+            <input type="url" id="f-tokped" placeholder="https://tokopedia.com/..."/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Pesan / Catatan Tambahan</label>
+          <textarea id="f-catatan" rows="3" placeholder="Ada hal lain yang ingin Anda sampaikan kepada tim kami?"></textarea>
+        </div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-prev" onclick="prevStep(3)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Sebelumnya
+        </button>
+        <button class="btn-submit-final" onclick="submitForm()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Kirim Karya
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg width="36" height="36" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="success-title">Karya Berhasil Dikirim! 🎉</h2>
+      <p class="success-desc">Terima kasih telah mempercayakan karya Anda kepada Labu Karya Publisher. Tim kami akan segera meninjau dan menghubungi Anda.</p>
+      <div class="success-actions">
+        <a href="index.html" class="btn-home">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Kembali ke Beranda
+        </a>
+        <button class="btn-upload-again" onclick="resetForm()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.67"/></svg>
+          Upload Karya Lain
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /form-card -->
+
+  <!-- RIGHT: PREVIEW SIDEBAR -->
+  <aside class="preview-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-header">
+        <div class="sidebar-header-icon">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div>
+          <h3>Pratinjau Kartu Buku</h3>
+          <small>Tampilan di halaman katalog</small>
+        </div>
+      </div>
+      <div class="sidebar-body">
+        <div class="preview-book-cover" id="sidebarCover">
+          <div class="cover-placeholder" id="coverPlaceholder">
+            <svg width="40" height="40" fill="none" stroke="var(--grey-mid)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9l4-4 4 4 4-4 4 4"/></svg>
+            <p>Cover buku<br/>akan muncul di sini</p>
+          </div>
+          <img id="sidebarCoverImg" src="" alt="" style="display:none"/>
+        </div>
+        <div class="preview-meta">
+          <div class="meta-row">
+            <span class="meta-label">Judul</span>
+            <span class="meta-value empty" id="prev-judul">Belum diisi</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Penulis</span>
+            <span class="meta-value empty" id="prev-penulis">Belum diisi</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Genre</span>
+            <span class="meta-value empty" id="prev-genre">Belum dipilih</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Harga</span>
+            <span class="meta-value empty" id="prev-harga">Belum diisi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-tip" style="margin-top:1rem">
+      <strong>💡 Tips Cover Buku</strong>
+      Gunakan gambar portrait (2:3) dengan resolusi minimal 600×900px agar tampil optimal di katalog dan marketplace.
+    </div>
+  </aside>
+
+</div><!-- /page-wrap -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+  <span id="toastMsg">Error</span>
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 3;
+  let selectedGenre = '';
+  let coverFile = null;
+
+  // ── STEP NAVIGATION ──
+  function goToStep(n) {
+    // Hide all sections
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById(`section-${i}`).classList.remove('active');
+      document.getElementById(`step-ind-${i}`).classList.remove('active', 'done');
+    }
+    // Mark done steps
+    for (let i = 1; i < n; i++) {
+      const ind = document.getElementById(`step-ind-${i}`);
+      ind.classList.add('done');
+      document.getElementById(`step-num-${i}`).innerHTML = `<svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+    }
+    // Mark active step
+    document.getElementById(`step-ind-${n}`).classList.add('active');
+    if (n <= totalSteps) {
+      document.getElementById(`section-${n}`).classList.add('active');
+    }
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextStep(from) {
+    if (!validateStep(from)) return;
+    goToStep(from + 1);
+  }
+
+  function prevStep(from) {
+    goToStep(from - 1);
+  }
+
+  // ── VALIDATION ──
+  function validateStep(step) {
+    let valid = true;
+
+    if (step === 1) {
+      const penulis = document.getElementById('f-penulis').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      setError('f-penulis', 'err-penulis', !penulis);
+      setError('f-email', 'err-email', !email || !email.includes('@'));
+      if (!penulis || !email || !email.includes('@')) valid = false;
+    }
+
+    if (step === 2) {
+      const judul = document.getElementById('f-judul').value.trim();
+      const harga = document.getElementById('f-harga').value.trim();
+      const sinopsis = document.getElementById('f-sinopsis').value.trim();
+      setError('f-judul', 'err-judul', !judul);
+      setError('f-harga', 'err-harga', !harga);
+      setError('f-sinopsis', 'err-sinopsis', !sinopsis);
+      const genreErr = document.getElementById('err-genre');
+      if (!selectedGenre) {
+        genreErr.classList.add('visible');
+        valid = false;
+      } else {
+        genreErr.classList.remove('visible');
+      }
+      if (!judul || !harga || !sinopsis) valid = false;
+    }
+
+    if (!valid) {
+      showToast('Harap lengkapi semua field yang wajib diisi.', false);
+    }
+    return valid;
+  }
+
+  function setError(fieldId, errId, isError) {
+    const field = document.getElementById(fieldId);
+    const err = document.getElementById(errId);
+    if (isError) {
+      field.classList.add('error');
+      err.classList.add('visible');
+    } else {
+      field.classList.remove('error');
+      err.classList.remove('visible');
+    }
+  }
+
+  // Remove error on input
+  ['f-penulis','f-email','f-judul','f-harga','f-sinopsis'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('error');
+    });
+  });
+
+  // ── GENRE CHIPS ──
+  document.querySelectorAll('.genre-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedGenre = chip.dataset.genre;
+      document.getElementById('err-genre').classList.remove('visible');
+      updatePreview();
+    });
+  });
+
+  // ── LIVE PREVIEW ──
+  function updatePreview() {
+    const judul = document.getElementById('f-judul')?.value.trim() || '';
+    const penulis = document.getElementById('f-penulis')?.value.trim() || '';
+    const harga = document.getElementById('f-harga')?.value.trim() || '';
+
+    const prevJudul = document.getElementById('prev-judul');
+    prevJudul.textContent = judul || 'Belum diisi';
+    prevJudul.className = 'meta-value' + (judul ? '' : ' empty');
+
+    const prevPenulis = document.getElementById('prev-penulis');
+    prevPenulis.textContent = penulis || 'Belum diisi';
+    prevPenulis.className = 'meta-value' + (penulis ? '' : ' empty');
+
+    const prevGenre = document.getElementById('prev-genre');
+    if (selectedGenre) {
+      prevGenre.innerHTML = `<span class="meta-genre-chip">${selectedGenre}</span>`;
+    } else {
+      prevGenre.textContent = 'Belum dipilih';
+      prevGenre.className = 'meta-value empty';
+    }
+
+    const prevHarga = document.getElementById('prev-harga');
+    if (harga && !isNaN(harga)) {
+      prevHarga.innerHTML = `<span class="meta-price">Rp ${parseInt(harga).toLocaleString('id-ID')}</span>`;
+    } else {
+      prevHarga.textContent = 'Belum diisi';
+      prevHarga.className = 'meta-value empty';
+    }
+  }
+
+  ['f-judul','f-penulis','f-harga'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updatePreview);
+  });
+
+  // Bio character counter
+  const bioArea = document.getElementById('f-bio');
+  bioArea.addEventListener('input', () => {
+    if (bioArea.value.length > 300) bioArea.value = bioArea.value.slice(0, 300);
+  });
+
+  // Harga: only numbers
+  document.getElementById('f-harga').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    updatePreview();
+  });
+
+  // ── FILE UPLOAD ──
+  const fileDrop = document.getElementById('fileDrop');
+  const coverInput = document.getElementById('coverInput');
+  const fileBrowse = document.getElementById('fileBrowse');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+  const previewName = document.getElementById('previewName');
+  const previewSize = document.getElementById('previewSize');
+  const removeImg = document.getElementById('removeImg');
+  const sidebarCoverImg = document.getElementById('sidebarCoverImg');
+  const coverPlaceholder = document.getElementById('coverPlaceholder');
+
+  fileBrowse.addEventListener('click', () => coverInput.click());
+  fileDrop.addEventListener('click', (e) => {
+    if (e.target !== fileBrowse) coverInput.click();
+  });
+
+  fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+  fileDrop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileDrop.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  coverInput.addEventListener('change', () => {
+    if (coverInput.files[0]) handleFile(coverInput.files[0]);
+  });
+
+  function handleFile(file) {
+    if (!file.type.startsWith('image/')) {
+      showToast('File harus berupa gambar (PNG, JPG, WEBP).', false); return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Ukuran file maksimal 5MB.', false); return;
+    }
+    coverFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+      sidebarCoverImg.src = e.target.result;
+      sidebarCoverImg.style.display = 'block';
+      coverPlaceholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+    previewName.textContent = file.name;
+    previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+    fileDrop.style.display = 'none';
+    previewWrap.style.display = 'flex';
+  }
+
+  removeImg.addEventListener('click', () => {
+    coverFile = null;
+    coverInput.value = '';
+    previewImg.src = '';
+    sidebarCoverImg.src = '';
+    sidebarCoverImg.style.display = 'none';
+    coverPlaceholder.style.display = 'flex';
+    fileDrop.style.display = 'flex';
+    previewWrap.style.display = 'none';
+  });
+
+  // ── SUBMIT ──
+  function submitForm() {
+    // Collect all data
+    const data = {
+      penulis: document.getElementById('f-penulis').value.trim(),
+      pena: document.getElementById('f-pena').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      telp: document.getElementById('f-telp').value.trim(),
+      bio: document.getElementById('f-bio').value.trim(),
+      judul: document.getElementById('f-judul').value.trim(),
+      genre: selectedGenre,
+      harga: document.getElementById('f-harga').value.trim(),
+      halaman: document.getElementById('f-halaman').value.trim(),
+      sinopsis: document.getElementById('f-sinopsis').value.trim(),
+      shopee: document.getElementById('f-shopee').value.trim(),
+      tokped: document.getElementById('f-tokped').value.trim(),
+      catatan: document.getElementById('f-catatan').value.trim(),
+      coverName: coverFile ? coverFile.name : null,
+      submittedAt: new Date().toISOString(),
+    };
+
+    // Save to localStorage for index.html to pick up
+    try {
+      const existing = JSON.parse(localStorage.getItem('labuKaryaSubmissions') || '[]');
+      existing.push(data);
+      localStorage.setItem('labuKaryaSubmissions', JSON.stringify(existing));
+    } catch(e) { /* ignore storage errors */ }
+
+    // Show success
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById(`section-${i}`).classList.remove('active');
+      const ind = document.getElementById(`step-ind-${i}`);
+      ind.classList.remove('active');
+      ind.classList.add('done');
+      document.getElementById(`step-num-${i}`).innerHTML = `<svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+    }
+    document.getElementById(`step-ind-4`).classList.add('active');
+    document.getElementById('successScreen').classList.add('visible');
+    showToast('Karya berhasil dikirim! 🎉', true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── RESET ──
+  function resetForm() {
+    document.getElementById('f-penulis').value = '';
+    document.getElementById('f-pena').value = '';
+    document.getElementById('f-email').value = '';
+    document.getElementById('f-telp').value = '';
+    document.getElementById('f-bio').value = '';
+    document.getElementById('f-judul').value = '';
+    document.getElementById('f-harga').value = '';
+    document.getElementById('f-halaman').value = '';
+    document.getElementById('f-sinopsis').value = '';
+    document.getElementById('f-shopee').value = '';
+    document.getElementById('f-tokped').value = '';
+    document.getElementById('f-catatan').value = '';
+    document.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('selected'));
+    selectedGenre = '';
+    coverFile = null;
+    coverInput.value = '';
+    sidebarCoverImg.style.display = 'none';
+    coverPlaceholder.style.display = 'flex';
+    fileDrop.style.display = 'flex';
+    previewWrap.style.display = 'none';
+    document.getElementById('successScreen').classList.remove('visible');
+    // Reset step indicators
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById(`step-num-${i}`).textContent = i;
+      document.getElementById(`step-ind-${i}`).classList.remove('active','done');
+    }
+    document.getElementById(`step-ind-4`).classList.remove('active','done');
+    updatePreview();
+    goToStep(1);
+  }
+
+  // ── TOAST ──
+  function showToast(msg, success = true) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.textContent = msg;
+    toast.className = 'toast' + (success ? ' success' : '');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // ── HAMBURGER ──
+  document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('open');
+  });
+</script>
+</body>
+</html>
