@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Labu Karya Publisher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:    #0a1628;
+      --dark:    #0d2147;
+      --mid:     #1a4fa0;
+      --bright:  #2d7cf5;
+      --light:   #5ba3ff;
+      --pale:    #ddeeff;
+      --white:   #ffffff;
+      --gl:      #f4f6fb;
+      --gm:      #c5cdd8;
+      --gd:      #6b7a8d;
+      --td:      #0d1b2e;
+      --tb:      #334155;
+      --green:   #1a8a4a;
+      --red:     #c0392b;
+      --orange:  #e67e00;
+      --purple:  #7c4dff;
+      --sm:      0 2px 12px rgba(13,33,71,0.10);
+      --md:      0 8px 32px rgba(13,33,71,0.18);
+      --rsm:     8px;
+      --rmd:     16px;
+      --rlg:     24px;
+      --fd: 'Playfair Display', Georgia, serif;
+      --fb: 'Nunito', sans-serif;
+      --fa: 'Bebas Neue', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--fb); background: var(--gl); color: var(--tb); min-height: 100vh; display: flex; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; font-family: var(--fb); }
+    img { max-width: 100%; display: block; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f0f2f8; }
+    ::-webkit-scrollbar-thumb { background: var(--gm); border-radius: 3px; }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(145deg, var(--navy) 0%, var(--dark) 60%, #122560 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    #loginScreen.hidden { display: none; }
+    .login-card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--rlg);
+      padding: 3rem 2.5rem;
+      width: 100%; max-width: 420px;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      animation: fadeUp 0.5s ease both;
+    }
+    .login-logo { display: flex; align-items: center; justify-content: center; gap: 0.7rem; margin-bottom: 0.5rem; }
+    .login-logo img { width: 52px; height: 52px; border-radius: 50%; object-fit: contain; }
+    .login-logo-text { font-family: var(--fa); font-size: 2rem; color: white; letter-spacing: 1px; }
+    .login-logo-text .accent { color: var(--bright); }
+    .login-subtitle { color: rgba(255,255,255,0.5); font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2.5rem; }
+    .login-title { font-family: var(--fd); font-size: 1.4rem; color: white; font-weight: 700; margin-bottom: 0.3rem; }
+    .login-group { text-align: left; margin-bottom: 1rem; }
+    .login-group label { display: block; color: rgba(255,255,255,0.7); font-size: 0.82rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.5px; }
+    .login-group input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: var(--rsm); color: white;
+      font-size: 0.95rem; font-family: var(--fb);
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .login-group input::placeholder { color: rgba(255,255,255,0.3); }
+    .login-group input:focus { border-color: var(--bright); background: rgba(45,124,245,0.1); }
+    .login-err { color: #ff7b7b; font-size: 0.8rem; margin-top: 0.4rem; display: none; }
+    .login-err.show { display: block; }
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--bright), var(--mid));
+      color: white; font-weight: 800; font-size: 1rem;
+      padding: 0.85rem; border-radius: 50px;
+      box-shadow: 0 6px 24px rgba(45,124,245,0.4);
+      transition: all 0.25s; margin-top: 0.5rem;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(45,124,245,0.5); }
+    .login-hint { color: rgba(255,255,255,0.3); font-size: 0.75rem; margin-top: 1.2rem; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px; min-height: 100vh; flex-shrink: 0;
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      position: fixed; left: 0; top: 0; bottom: 0;
+      z-index: 100; transition: transform 0.3s;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+    .sidebar-logo { padding: 1.4rem 1.5rem; display: flex; align-items: center; gap: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .sidebar-logo img { width: 38px; height: 38px; border-radius: 50%; object-fit: contain; }
+    .sidebar-logo-text { font-family: var(--fa); font-size: 1.5rem; color: white; }
+    .sidebar-logo-text .accent { color: var(--bright); }
+    .sidebar-logo-sub { font-size: 0.68rem; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; display: block; margin-top: -2px; }
+    .sidebar-nav { padding: 1rem 0; flex: 1; overflow-y: auto; }
+    .nav-section { padding: 0.5rem 1.5rem 0.2rem; font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.7rem 1.5rem; margin: 0.1rem 0.7rem;
+      border-radius: var(--rsm);
+      color: rgba(255,255,255,0.6); font-weight: 700; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+    .nav-item.active { background: rgba(45,124,245,0.2); color: var(--bright); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: var(--bright); border-radius: 0 3px 3px 0; }
+    .nav-badge { margin-left: auto; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 50px; background: var(--orange); color: white; min-width: 20px; text-align: center; }
+    .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); }
+    .btn-logout {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      background: rgba(192,57,43,0.15); border: 1px solid rgba(192,57,43,0.3);
+      color: #ff8b80; font-weight: 700; font-size: 0.85rem;
+      padding: 0.6rem; border-radius: var(--rsm); transition: all 0.2s;
+    }
+    .btn-logout:hover { background: rgba(192,57,43,0.25); color: #ffb3ae; }
+
+    /* ── MAIN ── */
+    .main-wrap { margin-left: 260px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar {
+      background: var(--white); border-bottom: 1px solid rgba(13,33,71,0.08);
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: var(--sm);
+    }
+    .topbar-title { font-family: var(--fd); font-size: 1.15rem; font-weight: 700; color: var(--td); }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .admin-chip { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--gd); }
+    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--bright), var(--mid)); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 800; }
+    .main-content { padding: 2rem; flex: 1; max-width: 1400px; width: 100%; }
+
+    /* ── VIEWS ── */
+    .view { display: none; animation: fadeUp 0.3s ease both; }
+    .view.active { display: block; }
+
+    /* ── STAT CARDS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--white); border-radius: var(--rmd);
+      padding: 1.4rem 1.5rem; box-shadow: var(--sm);
+      display: flex; align-items: center; gap: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--md); }
+    .stat-icon { width: 48px; height: 48px; border-radius: var(--rsm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-icon.pending { background: rgba(230,126,0,0.12); }
+    .stat-icon.approved { background: rgba(26,138,74,0.12); }
+    .stat-icon.total { background: rgba(45,124,245,0.12); }
+    .stat-icon.ebook { background: rgba(124,77,255,0.12); }
+    .stat-info .label { font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--gd); }
+    .stat-info .value { font-family: var(--fa); font-size: 2rem; color: var(--td); line-height: 1; margin-top: 0.15rem; }
+
+    /* ── SECTION HEADER ── */
+    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.7rem; }
+    .sec-title { font-family: var(--fd); font-size: 1.2rem; font-weight: 700; color: var(--td); }
+    .sec-sub { font-size: 0.82rem; color: var(--gd); margin-top: 0.1rem; }
+
+    /* ── FILTER ROW ── */
+    .filter-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .search-box { display: flex; align-items: center; gap: 0.5rem; background: var(--white); border: 1.5px solid var(--gm); border-radius: 50px; padding: 0.45rem 1rem; transition: border-color 0.2s; }
+    .search-box:focus-within { border-color: var(--bright); }
+    .search-box input { border: none; outline: none; font-size: 0.88rem; color: var(--td); width: 200px; font-family: var(--fb); background: transparent; }
+    .filter-chip { padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; border: 1.5px solid var(--gm); color: var(--gd); background: var(--gl); cursor: pointer; transition: all 0.2s; }
+    .filter-chip:hover { border-color: var(--bright); color: var(--bright); }
+    .filter-chip.active { background: var(--bright); border-color: var(--bright); color: white; }
+
+    /* ── TABLE ── */
+    .table-wrap { background: var(--white); border-radius: var(--rmd); box-shadow: var(--sm); overflow: hidden; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: 0.85rem 1.2rem; text-align: left; font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gd); background: var(--gl); border-bottom: 1px solid rgba(13,33,71,0.07); white-space: nowrap; }
+    .data-table td { padding: 0.85rem 1.2rem; border-bottom: 1px solid rgba(13,33,71,0.05); font-size: 0.86rem; vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(45,124,245,0.02); }
+    .cover-thumb { width: 44px; height: 58px; border-radius: 6px; object-fit: cover; box-shadow: var(--sm); }
+    .cover-thumb-fallback { width: 44px; height: 58px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .book-title-cell .title { font-weight: 700; color: var(--td); font-size: 0.9rem; }
+    .book-title-cell .author { font-size: 0.77rem; color: var(--gd); margin-top: 0.15rem; }
+    .genre-tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800; background: rgba(45,124,245,0.1); color: var(--mid); }
+    .ebook-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800; background: rgba(124,77,255,0.1); color: var(--purple); }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.7rem; border-radius: 50px; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
+    .status-badge.pending { background: rgba(230,126,0,0.12); color: var(--orange); }
+    .status-badge.approved { background: rgba(26,138,74,0.12); color: var(--green); }
+    .status-badge.rejected { background: rgba(192,57,43,0.1); color: var(--red); }
+    .action-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .btn-sm { padding: 0.35rem 0.8rem; border-radius: var(--rsm); font-size: 0.78rem; font-weight: 800; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .btn-approve { background: rgba(26,138,74,0.1); color: var(--green); border: 1px solid rgba(26,138,74,0.2); }
+    .btn-approve:hover { background: var(--green); color: white; }
+    .btn-reject { background: rgba(192,57,43,0.08); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
+    .btn-reject:hover { background: var(--red); color: white; }
+    .btn-edit { background: rgba(45,124,245,0.1); color: var(--bright); border: 1px solid rgba(45,124,245,0.2); }
+    .btn-edit:hover { background: var(--bright); color: white; }
+    .btn-delete { background: rgba(192,57,43,0.08); color: var(--red); border: 1px solid rgba(192,57,43,0.15); }
+    .btn-delete:hover { background: var(--red); color: white; }
+    .btn-view { background: rgba(13,33,71,0.06); color: var(--td); border: 1px solid rgba(13,33,71,0.12); }
+    .btn-view:hover { background: var(--td); color: white; }
+    .btn-ebook { background: rgba(124,77,255,0.1); color: var(--purple); border: 1px solid rgba(124,77,255,0.2); }
+    .btn-ebook:hover { background: var(--purple); color: white; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 4rem 2rem; }
+    .empty-icon { font-size: 3rem; margin-bottom: 0.7rem; }
+    .empty-state h3 { font-family: var(--fd); font-size: 1.15rem; color: var(--td); margin-bottom: 0.3rem; }
+    .empty-state p { font-size: 0.85rem; color: var(--gd); }
+
+    /* ── BOOK GRID (katalog view) ── */
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; }
+    .admin-book-card { background: var(--white); border-radius: var(--rmd); box-shadow: var(--sm); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+    .admin-book-card:hover { transform: translateY(-4px); box-shadow: var(--md); }
+    .abc-cover { aspect-ratio: 3/4; background: var(--pale); position: relative; overflow: hidden; }
+    .abc-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .abc-cover .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .abc-cover .seed-badge { position: absolute; top: 8px; left: 8px; background: var(--mid); color: white; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 50px; letter-spacing: 0.5px; }
+    .abc-cover .ebook-badge { position: absolute; top: 8px; right: 8px; background: var(--purple); color: white; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 50px; }
+    .abc-body { padding: 0.9rem 1rem; }
+    .abc-genre { font-size: 0.68rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--bright); margin-bottom: 0.2rem; }
+    .abc-title { font-family: var(--fd); font-size: 0.9rem; font-weight: 700; color: var(--td); line-height: 1.3; margin-bottom: 0.2rem; }
+    .abc-author { font-size: 0.75rem; color: var(--gd); margin-bottom: 0.5rem; }
+    .abc-price { font-family: var(--fa); font-size: 1.1rem; color: var(--bright); margin-bottom: 0.7rem; }
+    .abc-actions { display: flex; gap: 0.4rem; }
+    .abc-actions .btn-sm { flex: 1; justify-content: center; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(10,22,40,0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--white); border-radius: var(--rlg);
+      width: 100%; max-width: 680px; max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 30px 80px rgba(13,33,71,0.3);
+      transform: translateY(20px) scale(0.97); transition: transform 0.25s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal-header { padding: 1.4rem 1.8rem; border-bottom: 1px solid rgba(13,33,71,0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-title { font-family: var(--fd); font-size: 1.1rem; font-weight: 700; color: var(--td); }
+    .modal-close { width: 32px; height: 32px; border-radius: 50%; background: var(--gl); display: flex; align-items: center; justify-content: center; color: var(--gd); transition: all 0.2s; }
+    .modal-close:hover { background: var(--gm); color: var(--td); }
+    .modal-body { padding: 1.5rem 1.8rem; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 1rem 1.8rem; border-top: 1px solid rgba(13,33,71,0.08); display: flex; gap: 0.7rem; justify-content: flex-end; flex-shrink: 0; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    .form-group label { font-size: 0.82rem; font-weight: 800; color: var(--td); }
+    .form-group input, .form-group select, .form-group textarea {
+      background: var(--gl); border: 1.5px solid var(--gm); border-radius: var(--rsm);
+      padding: 0.65rem 0.9rem; font-size: 0.9rem; color: var(--td);
+      font-family: var(--fb); outline: none; transition: border-color 0.2s, background 0.2s; width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--bright); background: white; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn-primary { background: linear-gradient(135deg, var(--bright), var(--mid)); color: white; font-weight: 800; font-size: 0.9rem; padding: 0.65rem 1.5rem; border-radius: 50px; box-shadow: 0 4px 15px rgba(45,124,245,0.35); transition: all 0.2s; }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary-sm { background: var(--gl); border: 1.5px solid var(--gm); color: var(--gd); font-weight: 700; font-size: 0.9rem; padding: 0.65rem 1.3rem; border-radius: 50px; transition: all 0.2s; }
+    .btn-secondary-sm:hover { border-color: var(--mid); color: var(--mid); }
+    .btn-danger { background: var(--red); color: white; font-weight: 800; font-size: 0.9rem; padding: 0.65rem 1.3rem; border-radius: 50px; transition: all 0.2s; }
+    .btn-danger:hover { opacity: 0.85; }
+
+    /* Detail view in modal */
+    .detail-section { margin-bottom: 1.2rem; }
+    .detail-section h4 { font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--bright); margin-bottom: 0.7rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(45,124,245,0.15); }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .detail-item .dl { font-size: 0.72rem; font-weight: 700; color: var(--gd); text-transform: uppercase; letter-spacing: 0.8px; }
+    .detail-item .dv { font-size: 0.88rem; font-weight: 600; color: var(--td); margin-top: 0.1rem; word-break: break-word; }
+    .sinopsis-box { background: var(--gl); border-radius: var(--rsm); padding: 0.9rem 1rem; font-size: 0.86rem; line-height: 1.7; color: var(--tb); }
+    .cover-preview-modal { width: 100px; border-radius: var(--rsm); box-shadow: var(--sm); margin-bottom: 0.8rem; }
+
+    /* ── SETTINGS VIEW ── */
+    .settings-card { background: var(--white); border-radius: var(--rmd); box-shadow: var(--sm); padding: 2rem; max-width: 480px; }
+    .settings-card h3 { font-family: var(--fd); font-size: 1.1rem; font-weight: 700; color: var(--td); margin-bottom: 0.3rem; }
+    .settings-card p { font-size: 0.85rem; color: var(--gd); margin-bottom: 1.5rem; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; background: #1a8a4a; color: white; font-weight: 700; font-size: 0.85rem; padding: 0.7rem 1.3rem; border-radius: 50px; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 8px 25px rgba(0,0,0,0.25); transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); pointer-events: none; max-width: 320px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: var(--red); }
+
+    /* ── CONFIRM DIALOG ── */
+    .confirm-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(10,22,40,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .confirm-overlay.open { opacity: 1; pointer-events: all; }
+    .confirm-box { background: white; border-radius: var(--rmd); padding: 1.8rem; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(13,33,71,0.25); transform: scale(0.95); transition: transform 0.2s; }
+    .confirm-overlay.open .confirm-box { transform: scale(1); }
+    .confirm-icon { font-size: 2.5rem; margin-bottom: 0.7rem; }
+    .confirm-box h3 { font-family: var(--fd); font-size: 1.1rem; color: var(--td); margin-bottom: 0.4rem; }
+    .confirm-box p { font-size: 0.85rem; color: var(--gd); margin-bottom: 1.5rem; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 0.7rem; justify-content: center; }
+
+    /* ── RECENT TABLE in dashboard ── */
+    .recent-section { background: var(--white); border-radius: var(--rmd); box-shadow: var(--sm); overflow: hidden; }
+    .recent-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid rgba(13,33,71,0.06); display: flex; align-items: center; justify-content: space-between; }
+    .recent-header h3 { font-family: var(--fd); font-size: 1rem; font-weight: 700; color: var(--td); }
+    .view-all-btn { font-size: 0.8rem; font-weight: 700; color: var(--bright); cursor: pointer; }
+    .view-all-btn:hover { text-decoration: underline; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) { .sidebar { transform: translateX(-100%); } .sidebar.mobile-open { transform: translateX(0); } .main-wrap { margin-left: 0; } .mobile-menu-btn { display: flex !important; } }
+    .mobile-menu-btn { display: none; background: none; padding: 0.3rem; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="Labu_Karya_Pub.jpeg" alt="Logo" onerror="this.style.display='none'"/>
+      <span class="login-logo-text">Labu<span class="accent">Karya</span></span>
+    </div>
+    <div class="login-subtitle">Admin Panel</div>
+    <h2 class="login-title">Masuk ke Dashboard</h2>
+    <div style="height:1.5rem"></div>
+    <div class="login-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username"/>
+    </div>
+    <div class="login-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+      <div class="login-err" id="loginErr">Username atau password salah.</div>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <div class="login-hint">Default: admin / labupub2024</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="Labu_Karya_Pub.jpeg" alt="Logo" onerror="this.style.display='none'"/>
+    <div>
+      <span class="sidebar-logo-text">Labu<span class="accent">Karya</span></span>
+      <span class="sidebar-logo-sub">Administrator</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Menu Utama</div>
+    <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-section">Manajemen</div>
+    <div class="nav-item" onclick="showView('pending')" id="nav-pending">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Karya Masuk
+      <span class="nav-badge" id="pendingBadge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="showView('katalog')" id="nav-katalog">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Katalog Aktif
+    </div>
+    <div class="nav-section">Lainnya</div>
+    <div class="nav-item" onclick="showView('settings')" id="nav-settings">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </div>
+    <div class="nav-item" onclick="window.open('index.html','_blank')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Lihat Website
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Keluar
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap" id="mainWrap">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+        <svg width="22" height="22" fill="none" stroke="var(--td)" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="admin-chip">
+        <div class="admin-avatar">A</div>
+        <span id="adminLabel">Administrator</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="recent-section">
+        <div class="recent-header">
+          <h3>Karya Terbaru Masuk</h3>
+          <span class="view-all-btn" onclick="showView('pending')">Lihat Semua →</span>
+        </div>
+        <div id="recentTable"></div>
+      </div>
+    </div>
+
+    <!-- PENDING VIEW -->
+    <div class="view" id="view-pending">
+      <div class="sec-header">
+        <div>
+          <div class="sec-title">Karya Masuk — Menunggu Verifikasi</div>
+          <div class="sec-sub">Tinjau, setujui, atau tolak karya dari penulis</div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="search-box">
+          <svg width="15" height="15" fill="none" stroke="var(--gd)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="pendingSearch" placeholder="Cari judul / penulis..." oninput="renderPending()"/>
+        </div>
+        <div class="filter-chip active" data-pf="all" onclick="setPendingFilter(this)">Semua</div>
+        <div class="filter-chip" data-pf="pending" onclick="setPendingFilter(this)">Menunggu</div>
+        <div class="filter-chip" data-pf="rejected" onclick="setPendingFilter(this)">Ditolak</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="pendingTable">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Judul & Penulis</th>
+              <th>Genre</th>
+              <th>File</th>
+              <th>Tanggal</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="pendingBody"></tbody>
+        </table>
+        <div id="pendingEmpty" class="empty-state" style="display:none">
+          <div class="empty-icon">📭</div>
+          <h3>Tidak ada karya masuk</h3>
+          <p>Belum ada pengiriman karya dari penulis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- KATALOG VIEW -->
+    <div class="view" id="view-katalog">
+      <div class="sec-header">
+        <div>
+          <div class="sec-title">Katalog Aktif</div>
+          <div class="sec-sub">Buku yang sudah terverifikasi dan tampil di website</div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="search-box">
+          <svg width="15" height="15" fill="none" stroke="var(--gd)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="katalogSearch" placeholder="Cari judul / penulis..." oninput="renderKatalog()"/>
+        </div>
+      </div>
+      <div class="book-grid" id="katalogGrid"></div>
+      <div id="katalogEmpty" class="empty-state" style="display:none">
+        <div class="empty-icon">📚</div>
+        <h3>Katalog kosong</h3>
+        <p>Belum ada buku yang disetujui. Setujui karya dari halaman Karya Masuk.</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div class="view" id="view-settings">
+      <div class="sec-header"><div><div class="sec-title">Pengaturan</div><div class="sec-sub">Kelola akun dan preferensi admin</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:1.2rem;">
+        <div class="settings-card">
+          <h3>Ubah Password</h3>
+          <p>Ganti password login administrator panel.</p>
+          <div class="form-group">
+            <label>Password Lama</label>
+            <input type="password" id="setPwdOld" placeholder="Password saat ini"/>
+          </div>
+          <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" id="setPwdNew" placeholder="Minimal 6 karakter"/>
+          </div>
+          <div class="form-group">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" id="setPwdConfirm" placeholder="Ulangi password baru"/>
+          </div>
+          <button class="btn-primary" onclick="changePassword()">Simpan Password Baru</button>
+        </div>
+        <div class="settings-card">
+          <h3>Reset Data</h3>
+          <p>Hapus semua data submission dan katalog (tidak dapat dibatalkan).</p>
+          <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+            <button class="btn-sm btn-reject" onclick="confirmClearPending()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              Hapus Semua Pending
+            </button>
+            <button class="btn-sm btn-reject" onclick="confirmClearApproved()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              Hapus Katalog (non-seed)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /main-wrap -->
+
+<!-- DETAIL / EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Detail Karya</div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <h3 id="confirmTitle">Konfirmasi</h3>
+    <p id="confirmMsg">Yakin?</p>
+    <div class="confirm-actions">
+      <button class="btn-secondary-sm" onclick="closeConfirm()">Batal</button>
+      <button id="confirmOkBtn" class="btn-danger" onclick="">Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="adminToast">
+  <span id="adminToastMsg">—</span>
+</div>
+
+<script>
+/* ============================================================
+   LABU KARYA PUBLISHER — ADMIN PANEL
+   ============================================================ */
+
+const PENDING_KEY  = 'labuKaryaPending';
+const APPROVED_KEY = 'labuKaryaApproved';
+const AUTH_KEY     = 'labuKaryaAdminAuth';
+const PWD_KEY      = 'labuKaryaAdminPwd';
+const DEFAULT_PWD  = 'labupub2024';
+const DEFAULT_USER = 'admin';
+
+let currentPendingFilter = 'all';
+let editingId = null; // id of submission/book being edited
+let editingType = null; // 'pending' or 'catalog'
+
+/* ── AUTH ── */
+function getAdminPwd() {
+  return localStorage.getItem(PWD_KEY) || DEFAULT_PWD;
+}
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  if (user === DEFAULT_USER && pass === getAdminPwd()) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('loginScreen').classList.add('hidden');
+    err.classList.remove('show');
+    initAdmin();
+  } else {
+    err.classList.add('show');
+    document.getElementById('loginPass').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+/* ── INDEXEDDB for ebook retrieval ── */
+const EbookDB = {
+  db: null,
+  async init() {
+    if (this.db) return;
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('LabuKaryaEbooks', 1);
+      req.onupgradeneeded = e => { e.target.result.createObjectStore('ebooks', { keyPath: 'id' }); };
+      req.onsuccess = e => { this.db = e.target.result; resolve(); };
+      req.onerror = () => resolve(); // fail gracefully
+    });
+  },
+  async get(id) {
+    await this.init();
+    if (!this.db) return null;
+    return new Promise((resolve) => {
+      try {
+        const tx = this.db.transaction('ebooks', 'readonly');
+        const req = tx.objectStore('ebooks').get(id);
+        req.onsuccess = e => resolve(e.target.result || null);
+        req.onerror = () => resolve(null);
+      } catch { resolve(null); }
+    });
+  },
+  async delete(id) {
+    await this.init();
+    if (!this.db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = this.db.transaction('ebooks', 'readwrite');
+        tx.objectStore('ebooks').delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch { resolve(); }
+    });
+  }
+};
+
+/* ── STORAGE HELPERS ── */
+function getPending() {
+  try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch { return []; }
+}
+function savePending(arr) { localStorage.setItem(PENDING_KEY, JSON.stringify(arr)); }
+function getApproved() {
+  try { return JSON.parse(localStorage.getItem(APPROVED_KEY) || '[]'); } catch { return []; }
+}
+function saveApproved(arr) { localStorage.setItem(APPROVED_KEY, JSON.stringify(arr)); }
+
+function formatRupiah(v) { return 'Rp ' + (parseInt(String(v || 0).replace(/\D/g,'')) || 0).toLocaleString('id-ID'); }
+function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}); }
+
+/* ── VIEW NAV ── */
+const viewTitles = { dashboard: 'Dashboard', pending: 'Karya Masuk', katalog: 'Katalog Aktif', settings: 'Pengaturan' };
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  document.getElementById('topbarTitle').textContent = viewTitles[id] || id;
+  if (id === 'pending') renderPending();
+  if (id === 'katalog') renderKatalog();
+  if (id === 'dashboard') renderDashboard();
+  closeMobileSidebar();
+}
+
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+}
+
+/* ── INIT ── */
+function initAdmin() {
+  updatePendingBadge();
+  renderDashboard();
+}
+
+function updatePendingBadge() {
+  const pending = getPending().filter(s => s.status === 'pending');
+  const badge = document.getElementById('pendingBadge');
+  if (pending.length > 0) {
+    badge.textContent = pending.length;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ── DASHBOARD ── */
+function renderDashboard() {
+  const pending = getPending();
+  const approved = getApproved();
+  const pendingCount = pending.filter(s => s.status === 'pending').length;
+  const approvedCount = approved.length;
+  const totalBooks = approvedCount + 3; // +3 seed
+  const ebookCount = [...pending, ...approved].filter(b => b.hasEbook).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon pending"><svg width="24" height="24" fill="none" stroke="#e67e00" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="stat-info"><div class="label">Menunggu Tinjauan</div><div class="value">${pendingCount}</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon approved"><svg width="24" height="24" fill="none" stroke="#1a8a4a" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="stat-info"><div class="label">Karya Disetujui</div><div class="value">${approvedCount}</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon total"><svg width="24" height="24" fill="none" stroke="#2d7cf5" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="stat-info"><div class="label">Total di Katalog</div><div class="value">${totalBooks}</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon ebook"><svg width="24" height="24" fill="none" stroke="#7c4dff" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="stat-info"><div class="label">Dengan E-Book</div><div class="value">${ebookCount}</div></div>
+    </div>`;
+
+  // Recent submissions
+  const recent = pending.slice(-5).reverse();
+  if (recent.length === 0) {
+    document.getElementById('recentTable').innerHTML = `<div class="empty-state" style="padding:2.5rem"><div class="empty-icon">📭</div><h3>Belum ada submission</h3><p>Karya dari penulis akan muncul di sini.</p></div>`;
+  } else {
+    document.getElementById('recentTable').innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>Cover</th><th>Judul & Penulis</th><th>Genre</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>${recent.map(s => buildPendingRow(s)).join('')}</tbody>
+      </table>`;
+  }
+}
+
+/* ── PENDING VIEW ── */
+function setPendingFilter(el) {
+  document.querySelectorAll('[data-pf]').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentPendingFilter = el.dataset.pf;
+  renderPending();
+}
+
+function renderPending() {
+  const q = document.getElementById('pendingSearch')?.value.toLowerCase() || '';
+  let subs = getPending();
+  if (currentPendingFilter !== 'all') subs = subs.filter(s => s.status === currentPendingFilter);
+  if (q) subs = subs.filter(s =>
+    s.judul.toLowerCase().includes(q) ||
+    s.penulis.toLowerCase().includes(q) ||
+    (s.pena && s.pena.toLowerCase().includes(q))
+  );
+  subs = subs.slice().reverse();
+
+  const tbody = document.getElementById('pendingBody');
+  const empty = document.getElementById('pendingEmpty');
+
+  if (subs.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = subs.map(s => buildPendingRow(s)).join('');
+  }
+}
+
+function buildCoverCell(sub) {
+  if (sub.coverDataUrl) {
+    return `<img src="${sub.coverDataUrl}" class="cover-thumb" alt="cover"/>`;
+  }
+  const emojis = { 'Cerpen Inspiratif':'📖','Romance':'💕','Fiksi Ilmiah':'🚀','Fantasi':'🧙','Thriller & Misteri':'🔍','Pendidikan':'🎓','Biografi':'👤','Self-Help':'💪','Puisi & Sastra':'🌸','Agama & Spiritual':'🕌','Komedi':'😄' };
+  const colors = { 'Cerpen Inspiratif':'#1a4fa0','Romance':'#8b1a5a','Fiksi Ilmiah':'#0a3d6b','Fantasi':'#3d1a8b','Thriller & Misteri':'#1a1a2e','Pendidikan':'#0f5a32','Biografi':'#4a2000','Self-Help':'#0f6b38','Puisi & Sastra':'#6b1a3d','Agama & Spiritual':'#3d2a00','Komedi':'#c45e00' };
+  const bg = colors[sub.genre] || '#1a4fa0';
+  const em = emojis[sub.genre] || '📚';
+  return `<div class="cover-thumb-fallback" style="background:linear-gradient(145deg,${bg}cc,${bg}88)">${em}</div>`;
+}
+
+function buildPendingRow(s) {
+  const statusMap = {
+    pending: `<span class="status-badge pending"><svg width="10" height="10" viewBox="0 0 10 10" fill="#e67e00"><circle cx="5" cy="5" r="5"/></svg> Menunggu</span>`,
+    approved: `<span class="status-badge approved"><svg width="10" height="10" viewBox="0 0 10 10" fill="#1a8a4a"><circle cx="5" cy="5" r="5"/></svg> Disetujui</span>`,
+    rejected: `<span class="status-badge rejected"><svg width="10" height="10" viewBox="0 0 10 10" fill="#c0392b"><circle cx="5" cy="5" r="5"/></svg> Ditolak</span>`,
+  };
+  const actions = s.status === 'pending'
+    ? `<button class="btn-sm btn-view" onclick="viewDetail('${s.id}')">👁 Detail</button>
+       <button class="btn-sm btn-approve" onclick="approveSubmission('${s.id}')">✓ Setujui</button>
+       <button class="btn-sm btn-reject" onclick="confirmReject('${s.id}')">✕ Tolak</button>`
+    : s.status === 'rejected'
+    ? `<button class="btn-sm btn-view" onclick="viewDetail('${s.id}')">👁 Detail</button>
+       <button class="btn-sm btn-approve" onclick="approveSubmission('${s.id}')">↩ Setujui Ulang</button>`
+    : `<span style="font-size:0.78rem;color:var(--green)">Sudah diproses</span>`;
+
+  return `<tr>
+    <td>${buildCoverCell(s)}</td>
+    <td><div class="book-title-cell"><div class="title">${s.judul}</div><div class="author">${s.pena || s.penulis} · ${s.email}</div></div></td>
+    <td><span class="genre-tag">${s.genre}</span></td>
+    <td>${s.hasEbook ? `<span class="ebook-tag"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${s.ebookName ? s.ebookName.slice(0,16)+'…' : 'Ada file'}</span>` : '<span style="color:var(--gm);font-size:0.8rem">Tidak ada</span>'}</td>
+    <td style="font-size:0.8rem;color:var(--gd)">${fmtDate(s.submittedAt)}</td>
+    <td>${statusMap[s.status] || ''}</td>
+    <td><div class="action-group">${actions}</div></td>
+  </tr>`;
+}
+
+/* ── APPROVE ── */
+function approveSubmission(id) {
+  const pending = getPending();
+  const idx = pending.findIndex(s => s.id === id);
+  if (idx < 0) return;
+  const sub = pending[idx];
+
+  // Move to approved
+  const approved = getApproved();
+  const approvedBook = {
+    ...sub,
+    status: 'approved',
+    approvedAt: new Date().toISOString(),
+  };
+  // Avoid duplicate
+  const existIdx = approved.findIndex(b => b.id === id);
+  if (existIdx >= 0) approved[existIdx] = approvedBook;
+  else approved.push(approvedBook);
+  saveApproved(approved);
+
+  // Update pending status
+  pending[idx].status = 'approved';
+  savePending(pending);
+
+  updatePendingBadge();
+  renderPending();
+  renderDashboard();
+  toast(`✅ "${sub.judul}" berhasil disetujui dan tampil di katalog!`);
+}
+
+/* ── REJECT ── */
+function confirmReject(id) {
+  const sub = getPending().find(s => s.id === id);
+  showConfirm(
+    '🚫 Tolak Karya',
+    `Tolak karya "${sub?.judul}"? Karya tidak akan ditampilkan di katalog.`,
+    () => rejectSubmission(id)
+  );
+}
+
+function rejectSubmission(id) {
+  const pending = getPending();
+  const idx = pending.findIndex(s => s.id === id);
+  if (idx < 0) return;
+  pending[idx].status = 'rejected';
+  savePending(pending);
+  updatePendingBadge();
+  renderPending();
+  renderDashboard();
+  toast('Karya telah ditolak.', true);
+}
+
+/* ── VIEW DETAIL ── */
+async function viewDetail(id) {
+  const sub = getPending().find(s => s.id === id) || getApproved().find(b => b.id === id);
+  if (!sub) return;
+
+  const coverHtml = sub.coverDataUrl
+    ? `<img src="${sub.coverDataUrl}" class="cover-preview-modal" alt="cover"/>`
+    : '';
+
+  let ebookBtn = '';
+  if (sub.hasEbook) {
+    const ebookData = await EbookDB.get(sub.id);
+    if (ebookData && ebookData.file) {
+      const url = URL.createObjectURL(ebookData.file);
+      ebookBtn = `<a href="${url}" download="${ebookData.name}" class="btn-sm btn-ebook" style="display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Unduh E-Book (${sub.ebookName || 'file'})
+      </a>`;
+    } else {
+      ebookBtn = `<span class="btn-sm" style="background:#f5f5f5;color:#888;pointer-events:none">📄 E-Book tidak tersedia di sesi ini</span>`;
+    }
+  }
+
+  document.getElementById('modalTitle').textContent = 'Detail Karya — ' + sub.judul;
+  document.getElementById('modalBody').innerHTML = `
+    ${coverHtml}
+    <div class="detail-section">
+      <h4>Identitas Penulis</h4>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dl">Nama</div><div class="dv">${sub.penulis}</div></div>
+        <div class="detail-item"><div class="dl">Nama Pena</div><div class="dv">${sub.pena || '—'}</div></div>
+        <div class="detail-item"><div class="dl">Email</div><div class="dv">${sub.email}</div></div>
+        <div class="detail-item"><div class="dl">Telepon</div><div class="dv">${sub.telp || '—'}</div></div>
+      </div>
+      ${sub.bio ? `<div style="margin-top:0.7rem"><div class="dl">Bio</div><div class="dv" style="margin-top:0.2rem">${sub.bio}</div></div>` : ''}
+    </div>
+    <div class="detail-section">
+      <h4>Detail Buku</h4>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dl">Judul</div><div class="dv">${sub.judul}</div></div>
+        <div class="detail-item"><div class="dl">Genre</div><div class="dv">${sub.genre}</div></div>
+        <div class="detail-item"><div class="dl">Harga</div><div class="dv">${formatRupiah(sub.harga)}</div></div>
+        <div class="detail-item"><div class="dl">Halaman</div><div class="dv">${sub.halaman || '—'}</div></div>
+      </div>
+      <div style="margin-top:0.7rem"><div class="dl">Sinopsis</div><div class="sinopsis-box" style="margin-top:0.4rem">${sub.sinopsis}</div></div>
+    </div>
+    <div class="detail-section">
+      <h4>File & Tautan</h4>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dl">Cover</div><div class="dv">${sub.coverName || '—'}</div></div>
+        <div class="detail-item"><div class="dl">E-Book</div><div class="dv">${sub.ebookName || 'Tidak ada'}</div></div>
+        <div class="detail-item"><div class="dl">Shopee</div><div class="dv">${sub.shopee ? `<a href="${sub.shopee}" target="_blank" style="color:var(--bright)">Lihat</a>` : '—'}</div></div>
+        <div class="detail-item"><div class="dl">Tokopedia</div><div class="dv">${sub.tokped ? `<a href="${sub.tokped}" target="_blank" style="color:var(--bright)">Lihat</a>` : '—'}</div></div>
+      </div>
+      ${sub.catatan ? `<div style="margin-top:0.7rem"><div class="dl">Catatan Penulis</div><div class="dv" style="margin-top:0.2rem">${sub.catatan}</div></div>` : ''}
+      ${sub.hasEbook ? `<div style="margin-top:0.8rem">${ebookBtn}</div>` : ''}
+    </div>
+    <div class="detail-item" style="margin-top:0.5rem"><div class="dl">Tanggal Submit</div><div class="dv">${fmtDate(sub.submittedAt)}</div></div>`;
+
+  const actions = sub.status === 'pending'
+    ? `<button class="btn-secondary-sm" onclick="closeModal()">Tutup</button>
+       <button class="btn-sm btn-edit btn-primary" onclick="openEdit('${sub.id}','pending')">✏️ Edit & Setujui</button>
+       <button class="btn-approve btn-sm" onclick="approveSubmission('${sub.id}');closeModal()">✓ Setujui Langsung</button>`
+    : `<button class="btn-primary" onclick="closeModal()">Tutup</button>`;
+  document.getElementById('modalFooter').innerHTML = actions;
+  openModal();
+}
+
+/* ── EDIT ── */
+function openEdit(id, type) {
+  editingId = id;
+  editingType = type;
+  const src = type === 'pending' ? getPending() : getApproved();
+  const item = src.find(b => b.id === id);
+  if (!item) return;
+
+  closeModal();
+  setTimeout(() => {
+    document.getElementById('modalTitle').textContent = (type === 'pending' ? '✏️ Edit & Setujui — ' : '✏️ Edit Buku — ') + item.judul;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="form-row-2">
+        <div class="form-group"><label>Judul Buku *</label><input type="text" id="ed-judul" value="${esc(item.judul)}"/></div>
+        <div class="form-group"><label>Genre</label>
+          <select id="ed-genre">
+            ${['Cerpen Inspiratif','Romance','Fiksi Ilmiah','Fantasi','Thriller & Misteri','Pendidikan','Biografi','Self-Help','Puisi & Sastra','Agama & Spiritual','Komedi','Lainnya'].map(g => `<option value="${g}"${item.genre===g?' selected':''}>${g}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Nama Penulis *</label><input type="text" id="ed-penulis" value="${esc(item.penulis)}"/></div>
+        <div class="form-group"><label>Nama Pena</label><input type="text" id="ed-pena" value="${esc(item.pena||'')}"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Harga (Rp) *</label><input type="text" id="ed-harga" value="${esc(item.harga)}"/></div>
+        <div class="form-group"><label>Jumlah Halaman</label><input type="number" id="ed-halaman" value="${esc(item.halaman||'')}"/></div>
+      </div>
+      <div class="form-group"><label>Sinopsis *</label><textarea id="ed-sinopsis" rows="4">${esc(item.sinopsis)}</textarea></div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Link Shopee</label><input type="url" id="ed-shopee" value="${esc(item.shopee||'')}"/></div>
+        <div class="form-group"><label>Link Tokopedia</label><input type="url" id="ed-tokped" value="${esc(item.tokped||'')}"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Email Penulis</label><input type="email" id="ed-email" value="${esc(item.email||'')}"/></div>
+        <div class="form-group"><label>Telepon Penulis</label><input type="tel" id="ed-telp" value="${esc(item.telp||'')}"/></div>
+      </div>`;
+
+    const saveLabel = type === 'pending' ? '✓ Simpan & Setujui' : '💾 Simpan Perubahan';
+    document.getElementById('modalFooter').innerHTML = `
+      <button class="btn-secondary-sm" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" onclick="saveEdit()">${saveLabel}</button>`;
+    openModal();
+  }, 200);
+}
+
+function esc(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function saveEdit() {
+  const judul   = document.getElementById('ed-judul')?.value.trim();
+  const penulis = document.getElementById('ed-penulis')?.value.trim();
+  const harga   = document.getElementById('ed-harga')?.value.trim();
+  const sinopsis= document.getElementById('ed-sinopsis')?.value.trim();
+  if (!judul || !penulis || !harga || !sinopsis) { toast('Lengkapi semua field wajib!', false); return; }
+
+  const updates = {
+    judul, penulis,
+    pena:    document.getElementById('ed-pena')?.value.trim(),
+    genre:   document.getElementById('ed-genre')?.value,
+    harga,
+    halaman: document.getElementById('ed-halaman')?.value.trim(),
+    sinopsis,
+    shopee:  document.getElementById('ed-shopee')?.value.trim(),
+    tokped:  document.getElementById('ed-tokped')?.value.trim(),
+    email:   document.getElementById('ed-email')?.value.trim(),
+    telp:    document.getElementById('ed-telp')?.value.trim(),
+  };
+
+  if (editingType === 'pending') {
+    const pending = getPending();
+    const idx = pending.findIndex(s => s.id === editingId);
+    if (idx >= 0) {
+      Object.assign(pending[idx], updates);
+      savePending(pending);
+      // Approve immediately
+      approveSubmissionData(pending[idx]);
+      pending[idx].status = 'approved';
+      savePending(pending);
+    }
+    updatePendingBadge();
+    renderPending();
+  } else {
+    const approved = getApproved();
+    const idx = approved.findIndex(b => b.id === editingId);
+    if (idx >= 0) { Object.assign(approved[idx], updates); saveApproved(approved); }
+    renderKatalog();
+  }
+
+  closeModal();
+  renderDashboard();
+  toast('Perubahan berhasil disimpan! ✅');
+}
+
+function approveSubmissionData(sub) {
+  const approved = getApproved();
+  const approvedBook = { ...sub, status: 'approved', approvedAt: new Date().toISOString() };
+  const existIdx = approved.findIndex(b => b.id === sub.id);
+  if (existIdx >= 0) approved[existIdx] = approvedBook;
+  else approved.push(approvedBook);
+  saveApproved(approved);
+}
+
+/* ── KATALOG VIEW ── */
+function renderKatalog() {
+  const q = document.getElementById('katalogSearch')?.value.toLowerCase() || '';
+  let books = getApproved();
+  if (q) books = books.filter(b =>
+    b.judul.toLowerCase().includes(q) ||
+    b.penulis.toLowerCase().includes(q) ||
+    (b.pena && b.pena.toLowerCase().includes(q))
+  );
+
+  const grid = document.getElementById('katalogGrid');
+  const empty = document.getElementById('katalogEmpty');
+
+  if (books.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = books.map(b => buildKatalogCard(b)).join('');
+  }
+}
+
+function buildKatalogCard(b) {
+  const coverHtml = b.coverDataUrl
+    ? `<img src="${b.coverDataUrl}" alt="cover" style="width:100%;height:100%;object-fit:cover"/>`
+    : `<div class="fallback" style="background:linear-gradient(145deg,#1a4fa0,#0d2147)">${getEmoji(b.genre)}</div>`;
+
+  return `<div class="admin-book-card">
+    <div class="abc-cover">
+      ${b.isSeed ? '<span class="seed-badge">Sample</span>' : ''}
+      ${b.hasEbook ? '<span class="ebook-badge">E-Book</span>' : ''}
+      ${coverHtml}
+    </div>
+    <div class="abc-body">
+      <div class="abc-genre">${b.genre}</div>
+      <div class="abc-title">${b.judul}</div>
+      <div class="abc-author">✍️ ${b.pena || b.penulis}</div>
+      <div class="abc-price">${formatRupiah(b.harga)}</div>
+      <div class="abc-actions">
+        <button class="btn-sm btn-edit" onclick="openEdit('${b.id}','catalog')">✏️ Edit</button>
+        <button class="btn-sm btn-delete" onclick="confirmDeleteBook('${b.id}')">🗑 Hapus</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function getEmoji(genre) {
+  const map = {'Cerpen Inspiratif':'📖','Romance':'💕','Fiksi Ilmiah':'🚀','Fantasi':'🧙','Thriller & Misteri':'🔍','Pendidikan':'🎓','Biografi':'👤','Self-Help':'💪','Puisi & Sastra':'🌸','Agama & Spiritual':'🕌','Komedi':'😄'};
+  return map[genre] || '📚';
+}
+
+function confirmDeleteBook(id) {
+  const book = getApproved().find(b => b.id === id);
+  showConfirm('🗑 Hapus Buku', `Hapus "${book?.judul}" dari katalog? Tindakan ini tidak dapat dibatalkan.`, () => deleteBook(id));
+}
+
+async function deleteBook(id) {
+  const approved = getApproved().filter(b => b.id !== id);
+  saveApproved(approved);
+  await EbookDB.delete(id);
+  renderKatalog();
+  renderDashboard();
+  toast('Buku berhasil dihapus dari katalog.');
+}
+
+/* ── SETTINGS ── */
+function changePassword() {
+  const oldPwd = document.getElementById('setPwdOld').value;
+  const newPwd = document.getElementById('setPwdNew').value;
+  const confirm = document.getElementById('setPwdConfirm').value;
+  if (oldPwd !== getAdminPwd()) { toast('Password lama tidak benar!', false); return; }
+  if (newPwd.length < 6) { toast('Password baru minimal 6 karakter!', false); return; }
+  if (newPwd !== confirm) { toast('Konfirmasi password tidak cocok!', false); return; }
+  localStorage.setItem(PWD_KEY, newPwd);
+  document.getElementById('setPwdOld').value = '';
+  document.getElementById('setPwdNew').value = '';
+  document.getElementById('setPwdConfirm').value = '';
+  toast('Password berhasil diubah! ✅');
+}
+
+function confirmClearPending() {
+  showConfirm('🗑 Hapus Semua Pending', 'Hapus semua submission yang menunggu tinjauan? Ini tidak bisa dibatalkan.', () => {
+    savePending([]);
+    updatePendingBadge();
+    renderDashboard();
+    toast('Data pending berhasil dihapus.');
+  });
+}
+
+function confirmClearApproved() {
+  showConfirm('🗑 Hapus Katalog', 'Hapus semua buku yang sudah disetujui (kecuali sample)? Ini tidak bisa dibatalkan.', () => {
+    saveApproved([]);
+    renderDashboard();
+    toast('Katalog berhasil dikosongkan.');
+  });
+}
+
+/* ── MODAL HELPERS ── */
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; editingType = null; }
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+
+/* ── CONFIRM DIALOG ── */
+function showConfirm(title, msg, onOk) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  const btn = document.getElementById('confirmOkBtn');
+  btn.onclick = () => { onOk(); closeConfirm(); };
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
+document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmOverlay')) closeConfirm(); });
+
+/* ── TOAST ── */
+function toast(msg, success = true) {
+  const el = document.getElementById('adminToast');
+  el.querySelector('span').textContent = msg;
+  el.className = 'toast' + (success ? '' : ' error') + ' show';
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+/* ── BOOT ── */
+if (sessionStorage.getItem(AUTH_KEY)) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  initAdmin();
+}
+
+window.addEventListener('storage', e => {
+  if (e.key === PENDING_KEY || e.key === APPROVED_KEY) {
+    updatePendingBadge();
+    renderDashboard();
+  }
+});
+</script>
+</body>
+</html>
